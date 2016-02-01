@@ -9,7 +9,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import com.jjoe64.graphview.series.DataPoint;
 
 /**
  * Created by Jiangyi on 2016-01-31.
@@ -20,6 +22,7 @@ public class LightSensorFragment extends Fragment {
     private TextView currentLightLabel;
     private TextView maxLightLabel;
     private static Sensor sensor;
+    private float maxValue = 0;
 
     /**
      * Returns a new instance of this fragment.
@@ -43,13 +46,22 @@ public class LightSensorFragment extends Fragment {
         // Set up the listener for the sensor event
         SensorEventListener listener = new lightSensorEventListener();
         MainActivity.getSensorManager().registerListener(listener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        // Set up the reset graph button
+        Button resetButton = (Button) rootView.findViewById(R.id.reset_button);
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    // Reset the max values
+                    maxValue = 0;
+            }
+        });
         return rootView;
     }
 
     // Light sensor data is a tad different, since only 1 value is interesting;
     // Hence, we'll implement its listener separately for better code clarity
     private class lightSensorEventListener implements SensorEventListener {
-        float maxValue = 0;
 
         private lightSensorEventListener() {
             // Do nothing
@@ -61,8 +73,8 @@ public class LightSensorFragment extends Fragment {
             // and the sensor type is the one we want
             if (isAdded() && se.sensor.getType() == Sensor.TYPE_LIGHT) {
                 // Set the max value to be the current value if the current value is larger
-                if (se.values[0] > maxValue) {
-                    maxValue = se.values[0];
+                if (Math.abs(se.values[0]) > maxValue) {
+                    maxValue = Math.abs(se.values[0]);
                 }
                 // Update the labels accordingly to reflect the updated information
                 currentLightLabel.setText(String.format(getString(R.string.light_value_label), se.values[0]));

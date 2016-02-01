@@ -4,7 +4,7 @@
 
     <string name="title_accelerometer">Accelerometer</string>
     <string name="title_light">Light sensor</string>
-    <string name="title_magnetic">Magnetic Sensor</string>
+    <string name="title_magnetic">Magnetic sensor</string>
     <string name="title_rotation">Rotation vector</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -18,7 +18,9 @@
 
     <string name="unit_accelerometer">m/s^2</string>
     <string name="unit_magnetic_sensor">uT</string>
-    <string name="unit_rotation_vector">degrees</string>
+    <string name="unit_rotation_vector"></string> <!-- Rotation vector is unit-less -->
     <string name="light_value_label">Current light value: %.2f lx</string>
     <string name="light_value_max_label">Max light value measured: %.2f lx</string>
+
+    <string name="button_reset">Reset graph</string>
 </resources>

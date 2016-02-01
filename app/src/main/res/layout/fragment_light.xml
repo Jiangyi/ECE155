@@ -9,14 +9,22 @@
                 android:orientation="vertical"
                 tools:context=".MainActivity$PlaceholderFragment">
 
+    <!-- Label that displays current value info -->
     <TextView
             android:id="@+id/light_current_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <!-- Label that displays max value info -->
     <TextView
             android:id="@+id/light_max_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <!-- Reset button -->
+    <Button
+            android:id="@id/reset_button"
+            android:text="@string/button_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 </LinearLayout>

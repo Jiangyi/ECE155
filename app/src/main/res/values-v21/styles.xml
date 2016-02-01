@@ -2,5 +2,8 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:colorPrimary">#009688</item>
+        <item name="android:colorPrimaryDark">#00897b</item>
     </style>
+
 </resources>

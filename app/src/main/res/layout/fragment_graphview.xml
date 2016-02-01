@@ -9,24 +9,34 @@
                 android:orientation="vertical"
                 tools:context=".MainActivity$GraphViewFragment">
 
+    <!-- Graph that will be displaying the data -->
     <com.jjoe64.graphview.GraphView
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:id="@+id/graph" />
 
+    <!-- TextView for the label that will be displaying X-coordinate info -->
     <TextView
             android:id="@+id/x_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <!-- TextView for the label that will be displaying Y-coordinate info -->
     <TextView
             android:id="@+id/y_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <!-- TextView for the label that will be displaying Z-coordinate info -->
     <TextView
             android:id="@+id/z_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <!-- Reset button -->
+    <Button
+            android:id="@+id/reset_button"
+            android:text="@string/button_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 </LinearLayout>
