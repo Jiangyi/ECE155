@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        StepCounterManager.getInstance();
         setContentView(R.layout.activity_main);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)

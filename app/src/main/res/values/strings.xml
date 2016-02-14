@@ -26,6 +26,10 @@
 
     <string name="button_reset">Reset</string>
     <string name="button_pause">Pause</string>
+    <string name="button_unpause">Un-pause</string>
     <string name="button_save">Save to file</string>
     <string name="title_linear_acceleration_collector">Linear Acceleration (No graph)</string>
+
+    <string name="time_elapsed">Time elapsed since last sensor update: %d ns</string>
+    <string name="steps_counted">Steps counted: %d</string>
 </resources>

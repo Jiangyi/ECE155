@@ -28,8 +28,8 @@ public class DataCollectorFragment extends Fragment {
     // Member variables that will be used by the sensor listener
     private boolean isPaused = false;
     private static Sensor sensor;
+//    private long startTime, currentTime;
     private ArrayList<Float>[] dataArray = new ArrayList[4];
-
     protected static final int X = 0;
     protected static final int Y = 1;
     protected static final int Z = 2;
@@ -58,6 +58,16 @@ public class DataCollectorFragment extends Fragment {
         // Set up the listener for the sensor event
         SensorEventListener listener = new DataCollectorEventListener();
         MainActivity.getSensorManager().registerListener(listener, sensor, SensorManager.SENSOR_DELAY_FASTEST);
+//        startTime = System.nanoTime();
+
+        final TextView stepCounterLabel = (TextView) rootView.findViewById(R.id.step_counter_label);
+        StepCounterManager.getInstance().registerListener(new StepCounterManager.StepCounterListener() {
+            @Override
+            public void onStepCounterIncremented() {
+                stepCounterLabel.setText(String.format(getString(R.string.steps_counted), StepCounterManager.getInstance().getStepsCounted()));
+            }
+        });
+
         // Set up the reset graph button
         Button resetButton = (Button) rootView.findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
@@ -70,11 +80,12 @@ public class DataCollectorFragment extends Fragment {
         });
 
         // Set up the pause button
-        Button pauseButton = (Button) rootView.findViewById(R.id.pause_button);
+        final Button pauseButton = (Button) rootView.findViewById(R.id.pause_button);
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isPaused = !isPaused;
+                pauseButton.setText(isPaused ? getString(R.string.button_unpause) : getString(R.string.button_pause));
             }
         });
 
@@ -91,7 +102,6 @@ public class DataCollectorFragment extends Fragment {
 
     private void writeToFile() {
         String filename = "data";
-        String filenameWithFilter = "data_filtered";
         int counter = 0;
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilderPrinter printer = new StringBuilderPrinter(stringBuilder);
@@ -126,6 +136,9 @@ public class DataCollectorFragment extends Fragment {
             // Update the interface only if the fragment is currently attached to the activity
             // and the sensor type is the one we want
             if (isAdded() && se.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION && !isPaused) {
+//                currentTime = System.nanoTime();
+//                timeElapsedLabel.setText(String.format(getString(R.string.time_elapsed), currentTime - startTime));
+//                startTime = currentTime;
                 double pytha = 0;
                 for (int i = 0; i < 3; i++) {
                     pytha += se.values[i] * se.values[i];
