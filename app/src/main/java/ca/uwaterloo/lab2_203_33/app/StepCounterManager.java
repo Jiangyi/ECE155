@@ -20,20 +20,17 @@ public class StepCounterManager {
     private LinkedList<StepCounterListener> listenerList = new LinkedList<StepCounterListener>();
 
     public enum State {
-        REST (0),
-        RISE (1),
-        FALL (2),
-        SMALL_RISE (3),
-        SMALL_FALL (4);
+        REST,
+        RISE,
+        FALL,
+        SMALL_RISE,
+        SMALL_FALL,
+        INVALID
 
-        private final int value;
-
-        State(int value) {
-            this.value = value;
-        }
     }
 //    private int statePos[] = new int[] {0,0,0,0,0};
     private int statePos = 0;
+    private float peakVal = 0;
     private int stepCounter = 0;
     private State currentState = State.REST;
     private ArrayList<Float> dataPoints = new ArrayList<Float>();
@@ -76,6 +73,10 @@ public class StepCounterManager {
         return true;
     }
 
+    private float getSlope(float y1, float y2, int deltaX) {
+        return (y2 - y1) / deltaX;
+    }
+
     private void setCurrentState(State state) {
         currentState = state;
         statePos = dataPoints.size() - 1;
@@ -105,6 +106,7 @@ public class StepCounterManager {
                 Log.e("STATE", "RISE");
                 if (dataPoints.get(dataPoints.size() - 1) <= dataPoints.get(dataPoints.size() - 2)) {
                     setCurrentState(State.FALL);
+                    peakVal = dataPoints.get(dataPoints.size() - 2);
                 }
 //                else if (dataPoints.size() - 1 - statePos > 20) {
 //                setCurrentState(State.REST);
@@ -119,8 +121,11 @@ public class StepCounterManager {
             case SMALL_RISE:
                 Log.e("STATE", "SMALL_RISE");
                 if (dataPoints.get(dataPoints.size() - 1) <= dataPoints.get(dataPoints.size() - 2)) {
-                    if (dataPoints.get(dataPoints.size() - 2) > 3) {
+                    if (
+                      dataPoints.get(dataPoints.size() - 2) > peakVal ||
+                        (getSlope(dataPoints.get(dataPoints.size() - 5), dataPoints.get(dataPoints.size() - 2), 3) < 0.01)) {
                         // Not a small rise; Start over
+//                        setCurrentState(State.INVALID);
                         setCurrentState(State.REST);
                     } else {
                         setCurrentState(State.SMALL_FALL);
@@ -129,8 +134,18 @@ public class StepCounterManager {
                 break;
             case SMALL_FALL:
                 Log.e("STATE", "SMALL_FALL");
+                if (getSlope(dataPoints.get(dataPoints.size() - 4), dataPoints.get(dataPoints.size() - 1), 3) > 0.06) {
+//                    setCurrentState(State.INVALID);
+                    setCurrentState(State.REST);
+                }
                 if (dataPoints.get(dataPoints.size() - 1) < 1) {
                     incrementStepCounter();
+                    setCurrentState(State.REST);
+                }
+                break;
+            case INVALID:
+                Log.e("STATE", "INVALID");
+                if (dataPoints.get(dataPoints.size() - 1) < 2) {
                     setCurrentState(State.REST);
                 }
                 break;
@@ -174,7 +189,7 @@ public class StepCounterManager {
 //                    dataArray[i].add(se.values[i]);
                 }
                 pytha = (float) Math.sqrt(pytha);
-                dataPoints.add(lowPassFilter(pytha, dataPoints.get(dataPoints.size() - 1), 0.20f));
+                dataPoints.add(lowPassFilter(pytha, dataPoints.get(dataPoints.size() - 1), 0.25f));
                 if (dataPoints.size() > 15) {
                     updateState();
                 }
