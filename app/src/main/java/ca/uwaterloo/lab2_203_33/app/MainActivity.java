@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
         setUpToolbar();
     }
 
+    // Set up the ActionBar
     private void setUpToolbar() {
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         mToolbar.setTitle(R.string.app_name);

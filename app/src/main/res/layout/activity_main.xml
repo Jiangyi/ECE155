@@ -6,20 +6,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-<android.support.v7.widget.Toolbar
-            android:id="@+id/main_toolbar"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:minHeight="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    <!-- ActionBar -->
+    <android.support.v7.widget.Toolbar
+                android:id="@+id/main_toolbar"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:minHeight="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-<fragment
-          android:id="@+id/fragment"
-          android:name="ca.uwaterloo.lab2_203_33.app.MainActivityFragment"
-          tools:layout="@layout/fragment_main"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"/>
+    <!-- Main fragment that we'll be using -->
+    <fragment
+              android:id="@+id/fragment"
+              android:name="ca.uwaterloo.lab2_203_33.app.MainActivityFragment"
+              tools:layout="@layout/fragment_main"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"/>
 
 </LinearLayout>
