@@ -1,35 +1,12 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-           xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources>
     <string name="app_name">LAB2_203_33</string>
-
-    <string name="title_accelerometer">Accelerometer</string>
-    <string name="title_light">Light sensor</string>
-    <string name="title_linear_acceleration">Linear acceleration</string>
-    <string name="title_magnetic">Magnetic sensor</string>
-    <string name="title_rotation">Rotation vector</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_example">Example action</string>
-
+    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="xyz_data_label" ><xliff:g id="axis_label">%1$s</xliff:g>: <xliff:g id="current_value">%2$f</xliff:g> <xliff:g id="unit">%5$s</xliff:g>;
-                                    Max: <xliff:g id="max_value">%3$f</xliff:g> <xliff:g id="unit">%5$s</xliff:g>;
-                                    Min: <xliff:g id="min_value">%4$f</xliff:g> <xliff:g id="unit">%5$s</xliff:g></string>
-
-    <string name="unit_accelerometer">m/s^2</string>
-    <string name="unit_magnetic_sensor">uT</string>
-    <string name="unit_rotation_vector"></string> <!-- Rotation vector is unit-less -->
-    <string name="light_value_label">Current light value: %.2f lx</string>
-    <string name="light_value_max_label">Max light value measured: %.2f lx</string>
-
-    <string name="button_reset">Reset</string>
-    <string name="button_pause">Pause</string>
-    <string name="button_unpause">Un-pause</string>
-    <string name="button_save">Save to file</string>
-    <string name="title_linear_acceleration_collector">Linear Acceleration (No graph)</string>
-
-    <string name="time_elapsed">Time elapsed since last sensor update: %d ns</string>
-    <string name="steps_counted">Steps counted: %d</string>
+    <plurals name="step_counter">
+        <item quantity="one">Step counter:\n%d step taken</item>
+        <item quantity="other">Step counter:\n%d steps taken</item>
+    </plurals>
+    <string name="reset">Reset counter</string>
+    <string name="pause">Pause</string>
+    <string name="unpause">Un-pause</string>
 </resources>
