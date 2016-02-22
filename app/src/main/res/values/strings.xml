@@ -3,10 +3,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <plurals name="step_counter">
-        <item quantity="one">Step counter:\n%d step taken</item>
-        <item quantity="other">Step counter:\n%d steps taken</item>
+        <item quantity="one">Step counter (Tightened):\n%d step taken</item>
+        <item quantity="other">Step counter (Tightened):\n%d steps taken</item>
+    </plurals>
+    <plurals name="step_counter_relaxed">
+        <item quantity="one">Step counter (Relaxed; Please mark this one):\n%d step taken</item>
+        <item quantity="other">Step counter (Relaxed; Please mark this one):\n%d steps taken</item>
     </plurals>
     <string name="reset">Reset counter</string>
     <string name="pause">Pause</string>
-    <string name="unpause">Un-pause</string>
+    <string name="start">Start</string>
 </resources>

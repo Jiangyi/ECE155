@@ -25,14 +25,17 @@ public class MainActivityFragment extends Fragment {
     private float peakVal = 0;
     // Variable to store how many steps were taken
     private int stepCounter = 0;
+    private int stepCounterRelaxed = 0;
     // Boolean for pause function
-    private boolean isPaused = false;
+    private boolean isPaused = true;
     // Variable to store current state, used with FSM
     private State currentState = State.REST;
+    // Variable to store current state for the relaxed FSM
+    private State currentStateRelaxed = State.REST;
     // Arraylist of all data points gathered
     private ArrayList<Float> dataPoints = new ArrayList<Float>();
     // TextView that will be updated with step counter info
-    private TextView stepCounterLabel;
+    private TextView stepCounterLabel, stepCounterLabelRelaxed;
 
     // Enum that contains the 5 different states of the FSM
     public enum State {
@@ -52,6 +55,7 @@ public class MainActivityFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
         // Set up the step counter TextView
         stepCounterLabel = (TextView) rootView.findViewById(R.id.step_counter_label);
+        stepCounterLabelRelaxed = (TextView) rootView.findViewById(R.id.step_counter_relaxed_label);
 
         // Set up the reset button
         Button resetButton = (Button) rootView.findViewById(R.id.reset_button);
@@ -68,7 +72,7 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 isPaused = !isPaused;
-                pauseButton.setText(isPaused ? getString(R.string.unpause) : getString(R.string.pause));
+                pauseButton.setText(isPaused ? getString(R.string.start) : getString(R.string.pause));
             }
         });
 
@@ -81,7 +85,9 @@ public class MainActivityFragment extends Fragment {
     private void resetStepCounter() {
         // Reset the counter itself and update the TextView
         stepCounter = 0;
+        stepCounterRelaxed = 0;
         stepCounterLabel.setText(String.format(getResources().getQuantityString(R.plurals.step_counter, stepCounter), stepCounter));
+        stepCounterLabelRelaxed.setText(String.format(getResources().getQuantityString(R.plurals.step_counter_relaxed, stepCounterRelaxed), stepCounterRelaxed));
 
         // Clear out the arraylist holding the data points
         dataPoints.clear();
@@ -89,6 +95,7 @@ public class MainActivityFragment extends Fragment {
 
         // Set current state to rest
         setCurrentState(State.REST);
+        setCurrentStateRelaxed(State.REST);
     }
 
     // Set up the sensor here
@@ -114,6 +121,12 @@ public class MainActivityFragment extends Fragment {
         Log.d("CurrentState", state.toString());
     }
 
+    // Set current state and prints it to logcat
+    private void setCurrentStateRelaxed(State state) {
+        currentStateRelaxed = state;
+        Log.d("CurrentStateRelaxed", state.toString());
+    }
+
     // Return RC low-pass filter output samples, given input samples,
     // and alpha constant
     private float[] lowPassFilter(float[] in, float alpha) {
@@ -131,11 +144,18 @@ public class MainActivityFragment extends Fragment {
         return alpha * current + (1 - alpha) * past;
     }
 
-    // Increments the step counter, updates the TextView label, and logs the increment action to logcat
+    // Increments the tightened step counter, updates the TextView label, and logs the increment action to logcat
     private void incrementStepCounter() {
         Log.d("Step", "INCREMENTED");
         stepCounter++;
         stepCounterLabel.setText(String.format(getResources().getQuantityString(R.plurals.step_counter, stepCounter), stepCounter));
+    }
+
+    // Increments the relaxed step counter, updates the TextView label, and logs the increment action to logcat
+    private void incrementStepCounterRelaxed() {
+        Log.d("Step (Relaxed)", "INCREMENTED");
+        stepCounterRelaxed++;
+        stepCounterLabelRelaxed.setText(String.format(getResources().getQuantityString(R.plurals.step_counter_relaxed, stepCounterRelaxed), stepCounterRelaxed));
     }
 
     // Check if the data is trending (Either increasing or decreasing), given sections of the dataPoints arraylist
@@ -166,8 +186,8 @@ public class MainActivityFragment extends Fragment {
                 // Set state to rise if data is within the tolerance range and is increasing;
                 // This takes care of anybody who's trying to shake the phone around
                 if (1.75 < dataPoints.get(dataPoints.size() - 1)
-                        && dataPoints.get(dataPoints.size() - 1) < 7.7
-                        && isDataTrending(true, dataPoints.size() - 4, dataPoints.size() - 1)) {
+                        && dataPoints.get(dataPoints.size() - 1) < 7
+                        && isDataTrending(true, dataPoints.size() - 7, dataPoints.size() - 1)) {
                     setCurrentState(State.RISE);
                 }
                 break;
@@ -180,7 +200,7 @@ public class MainActivityFragment extends Fragment {
                 break;
             case FALL:
                 // If the data is increasing again, set state to small rise
-                if (isDataTrending(true, dataPoints.size() - 3, dataPoints.size() - 1)) {
+                if (isDataTrending(true, dataPoints.size() - 4, dataPoints.size() - 1)) {
                     setCurrentState(State.SMALL_RISE);
                 }
                 break;
@@ -189,7 +209,7 @@ public class MainActivityFragment extends Fragment {
                 if (dataPoints.get(dataPoints.size() - 1) <= dataPoints.get(dataPoints.size() - 2)) {
                     // Check if dataPoint is above the peak value from before or if the slope of recent data is less than 0.01
                     if (dataPoints.get(dataPoints.size() - 2) > peakVal
-                            || (getSlope(dataPoints.get(dataPoints.size() - 4), dataPoints.get(dataPoints.size() - 2), 2) < 0.01)) {
+                            || (getSlope(dataPoints.get(dataPoints.size() - 5), dataPoints.get(dataPoints.size() - 3), 2) < 0.01)) {
                         // If so, it wasn't a small rise that had occurred; Start over
                         setCurrentState(State.REST);
                     } else {
@@ -209,6 +229,55 @@ public class MainActivityFragment extends Fragment {
                 if (dataPoints.get(dataPoints.size() - 1) < 1) {
                     incrementStepCounter();
                     setCurrentState(State.REST);
+                }
+                break;
+        }
+    }
+
+
+    // This is where the action (AKA the Finite State Machine logic) for the relaxed counter happens;
+    // Update the state based on currentState and trends in the data
+    private void updateStateRelaxed() {
+        switch (currentStateRelaxed) {
+                // If the data is increasing again, set state to small rise
+            case REST:
+                // Set state to rise if data is within the tolerance range and is increasing;
+                // This takes care of anybody who's trying to shake the phone around
+                if (1.75 < dataPoints.get(dataPoints.size() - 1) && dataPoints.get(dataPoints.size() - 1) < 7 && isDataTrending(true, dataPoints.size() - 7, dataPoints.size() - 1)) {
+                    setCurrentStateRelaxed(State.RISE);
+                }
+                break;
+            case RISE:
+                // Set state to FALL when the data starts decreasing
+                if (dataPoints.get(dataPoints.size() - 1) <= dataPoints.get(dataPoints.size() - 2)) {
+                    setCurrentStateRelaxed(State.FALL);
+                }
+                break;
+            case FALL:
+                // If the data is increasing again, set state to small rise
+                if (isDataTrending(true, dataPoints.size() - 4, dataPoints.size() - 1)) {
+                    setCurrentStateRelaxed(State.SMALL_RISE);
+                }
+                break;
+            case SMALL_RISE:
+                // Check if data is decreasing again
+                if (dataPoints.get(dataPoints.size() - 1) <= dataPoints.get(dataPoints.size() - 2)) {
+                    // Check the y value of the small rise peak
+                    if (dataPoints.get(dataPoints.size() - 2) > 3) {
+                        // Not a small rise; Start over
+                        setCurrentStateRelaxed(State.REST);
+                    } else {
+                        // Else, move on to the small fall stage
+                        setCurrentStateRelaxed(State.SMALL_FALL);
+                    }
+                }
+                break;
+            case SMALL_FALL:
+                // If the datapoint value drops below 1, increment the counter and reset the state to rest;
+                // WE'VE DONE IT! (Probably, subject to errors )-: )
+                if (dataPoints.get(dataPoints.size() - 1) < 1) {
+                    incrementStepCounterRelaxed();
+                    setCurrentStateRelaxed(State.REST);
                 }
                 break;
         }
@@ -239,6 +308,7 @@ public class MainActivityFragment extends Fragment {
                 // (This is honestly more to prevent any ArrayIndexOutOfBoundsExceptions than anything heh.)
                 if (dataPoints.size() > 15) {
                     updateState();
+                    updateStateRelaxed();
                 }
             }
         }

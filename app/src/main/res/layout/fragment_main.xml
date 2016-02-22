@@ -15,6 +15,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <!-- TextView to display step counter data -->
+    <TextView
+            android:id="@+id/step_counter_relaxed_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <!-- Start/Pause button -->
+    <Button
+            android:id="@+id/pause_button"
+            android:text="@string/start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
     <!-- Reset button -->
     <Button
             android:id="@+id/reset_button"
@@ -22,10 +35,4 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-    <!-- Pause button -->
-    <Button
-            android:id="@+id/pause_button"
-            android:text="@string/pause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
 </LinearLayout>
