@@ -208,7 +208,7 @@ public class MainActivityFragment extends Fragment {
                 // Check if data is starting to decrease again
                 if (dataPoints.get(dataPoints.size() - 1) <= dataPoints.get(dataPoints.size() - 2)) {
                     // Check if dataPoint is above the peak value from before or if the slope of recent data is less than 0.01
-                    if (dataPoints.get(dataPoints.size() - 2) > peakVal
+                    if (dataPoints.get(dataPoints.size() - 2) > peakVal / 2
                             || (getSlope(dataPoints.get(dataPoints.size() - 5), dataPoints.get(dataPoints.size() - 3), 2) < 0.01)) {
                         // If so, it wasn't a small rise that had occurred; Start over
                         setCurrentState(State.REST);
