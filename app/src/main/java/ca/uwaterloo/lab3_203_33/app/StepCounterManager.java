@@ -38,6 +38,7 @@ public class StepCounterManager {
     }
 
     public static StepCounterManager getInstance() {
+        // If the manager has not been instantiated before, instantiate it
         if (stepCounterManager == null) {
             stepCounterManager = new StepCounterManager();
         }
@@ -48,10 +49,12 @@ public class StepCounterManager {
         setUpSensors();
     }
 
+    // Method to register a listener on the manager
     public void registerListener(StepCounterListener listener) {
         listenerList.add(listener);
     }
 
+    // Returns the current step count
     public int getStepCounter() {
         return stepCounter;
     }
@@ -109,7 +112,7 @@ public class StepCounterManager {
         return alpha * current + (1 - alpha) * past;
     }
 
-    // Increments the tightened step counter, updates the TextView label, and logs the increment action to logcat
+    // Increments the step counter, updates the TextView label, and logs the increment action to logcat
     private void incrementStepCounter() {
         Log.d("Step", "INCREMENTED");
         stepCounter++;
@@ -140,7 +143,7 @@ public class StepCounterManager {
         return true;
     }
 
-    // This is where the action (AKA the Finite State Machine logic) for the relaxed counter happens;
+    // This is where the action (AKA the Finite State Machine logic) for the counter happens;
     // Update the state based on currentState and trends in the data
     private void updateState() {
         switch (currentState) {
@@ -206,9 +209,12 @@ public class StepCounterManager {
                 }
                 // Square root the result as to get a scalar sum of the three vectors
                 pytha = (float) Math.sqrt(pytha);
+
                 // Feed the result through the low pass filter, and add it to the data array
                 float datapoint = lowPassFilter(pytha, dataPoints.get(dataPoints.size() - 1), 0.20f);
                 dataPoints.add(datapoint);
+
+                // Notify all registered listeners
                 for (StepCounterListener listener : listenerList) {
                     if (listener != null) {
                         listener.onDataPointAdded(datapoint);
@@ -228,6 +234,7 @@ public class StepCounterManager {
         }
     }
 
+    // Interface for other components to receive data change notices
     public interface StepCounterListener {
         void onStepChanged(int stepCounter);
 

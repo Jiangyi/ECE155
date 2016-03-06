@@ -20,8 +20,9 @@
     <string name="light_value_label">Current light value: %.2f lx</string>
     <string name="light_value_max_label">Max light value measured: %.2f lx</string>
     <string name="step_counter">Steps taken: %d</string>
-    <string name="displacement_east">East: <xliff:g id="value">%f</xliff:g></string>
-    <string name="displacement_north">North: <xliff:g id="value">%f</xliff:g></string>
+    <string name="displacement_east">East: <xliff:g id="value">%f</xliff:g> steps</string>
+    <string name="displacement_north">North: <xliff:g id="value">%f</xliff:g> steps</string>
+    <string name="graph_label_sum">Sum of vectors</string>
     <string name="button_reset">Reset</string>
     <string name="button_pause">Pause</string>
     <string name="button_start">Start</string>

@@ -32,6 +32,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import android.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,21 +52,17 @@ public class MapLoader
 	private static DocumentBuilderFactory docBuildFactory = DocumentBuilderFactory.newInstance();
 	private static DocumentBuilder DocBuilder = null;
 	
-	private PointF fileMaxCoord = new PointF();
-	private PointF fileScale = new PointF();
+	private static PointF fileMaxCoord = new PointF();
+	private static PointF fileScale = new PointF();
 
-	PedometerMap pedMap = new PedometerMap();
+	static PedometerMap pedMap = new PedometerMap();
 
-	public MapLoader() {
-
-	}
 	/**
 	 * Create a Pedometer map out of the provided SVG file.
-	 * @param dir pass the return from the method getExternalFilesDir(null) to this parameter
-	 * @param filename The filename of the map to load
+	 * @param map The file of the map to load
 	 * @return a PedometerMap representing the map file that was loaded
 	 */
-	public PedometerMap loadMap(File dir, final String filename)
+	public static PedometerMap loadMap(File map)
 	{
 		if(DocBuilder == null){
 			try {
@@ -75,13 +72,8 @@ public class MapLoader
 			}
 		}
 
-		File map = dir.listFiles(new FilenameFilter(){
 
-			public boolean accept(File dir, String name) {
-				return name.equals(filename);
-			}
-		})[0];
-		
+		Log.e("Map", map.getAbsolutePath() + "; exists: " + map.exists());
 		Document doc = null;
 
 		try {
@@ -126,7 +118,7 @@ public class MapLoader
 		return pedMap;
 	}
 	
-	private PointF MakePoint(String s1, String s2)
+	private static PointF MakePoint(String s1, String s2)
 	{
 		return new PointF(
 				Float.parseFloat(s1),
@@ -134,7 +126,7 @@ public class MapLoader
 				) ;
 	}
 	
-	private PointF MakePointReletive(PointF p, String s1, String s2)
+	private static PointF MakePointReletive(PointF p, String s1, String s2)
 	{
 		return new PointF(
 				p.x + Float.parseFloat(s1),
@@ -142,7 +134,7 @@ public class MapLoader
 				) ;
 	}
 	
-	private ArrayList<PointF> parseConvertPath(Node node) {
+	private static ArrayList<PointF> parseConvertPath(Node node) {
 		Element elem = (Element) node;
 		ArrayList<PointF> ret = new ArrayList<PointF>();
 		
@@ -267,7 +259,7 @@ public class MapLoader
 	 * Converts the coordinate to real-world space
 	 * @param coord
 	 */
-	private void convertCoord(PointF coord){
+	private static void convertCoord(PointF coord){
 		coord.set(coord.x * fileScale.x, coord.y * fileScale.y);
 	}
 }
