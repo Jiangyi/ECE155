@@ -1,7 +1,6 @@
 package ca.uwaterloo.lab3_203_33.app;
 
 import android.content.Context;
-import android.hardware.Sensor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,7 +29,7 @@ public class StepDisplacementFragment extends Fragment {
 
     private Button pauseButton;
     // TextViews that will be updated with step counter info
-    private TextView stepCounterLabel, eastDisplacementLabel, northDisplacementLabel;
+    private TextView stepCounterLabel, eastDisplacementLabel, northDisplacementLabel, angleLabel;
     // Used to make this a singleton class
     private static StepDisplacementFragment stepDisplacementFragment = null;
 
@@ -71,7 +70,7 @@ public class StepDisplacementFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_graphview, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_step_displacement, container, false);
 
         // Instantiate a new GraphManager and ask it to handle the graph within this fragment
         graphManager = new GraphManager((GraphView) rootView.findViewById(R.id.graph));
@@ -80,6 +79,7 @@ public class StepDisplacementFragment extends Fragment {
         stepCounterLabel = (TextView) rootView.findViewById(R.id.step_counter_label);
         eastDisplacementLabel = (TextView) rootView.findViewById(R.id.displacement_east_label);
         northDisplacementLabel = (TextView) rootView.findViewById(R.id.displacement_north_label);
+        angleLabel = (TextView) rootView.findViewById(R.id.angle);
 
         // Set up the reset button
         Button resetButton = (Button) rootView.findViewById(R.id.reset_button);
@@ -130,6 +130,8 @@ public class StepDisplacementFragment extends Fragment {
                 long degrees = (Math.round(Math.toDegrees(azimuth)) + 360) % 360;
                 // Then store the angle in radians
                 angle = (float) Math.toRadians(degrees);
+                angleLabel.setText(String.format(getString(R.string.angle), angle));
+
             }
         });
 
