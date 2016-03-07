@@ -151,7 +151,7 @@ public class StepCounterManager {
             case REST:
                 // Set state to rise if data is within the tolerance range and is increasing;
                 // This takes care of anybody who's trying to shake the phone around
-                if (1.75 < dataPoints.get(dataPoints.size() - 1) && dataPoints.get(dataPoints.size() - 1) < 3.7 && isDataTrending(true, dataPoints.size() - 7, dataPoints.size() - 1)) {
+                if (1.75 < dataPoints.get(dataPoints.size() - 1) && dataPoints.get(dataPoints.size() - 1) < 7 && isDataTrending(true, dataPoints.size() - 7, dataPoints.size() - 1)) {
                     setCurrentState(State.RISE);
                 }
                 break;
@@ -183,7 +183,7 @@ public class StepCounterManager {
             case SMALL_FALL:
                 // If the datapoint value drops below 1, increment the counter and reset the state to rest;
                 // WE'VE DONE IT! (Probably, subject to errors )-: )
-                if (dataPoints.get(dataPoints.size() - 1) < 0.6) {
+                if (dataPoints.get(dataPoints.size() - 1) < 1) {
                     incrementStepCounter();
                     setCurrentState(State.REST);
                 }
@@ -202,13 +202,13 @@ public class StepCounterManager {
             // Update the interface only if the sensor type is the one we want
             if (!StepDisplacementFragment.isPaused && se.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
                 // Variable to use for mathematical calculations
-                float pytha = se.values[2];
-//                for (int i = 0; i < 3; i++) {
-//                    // Perform pythagorean theorem on the X Y Z vectors
-//                    pytha += se.values[i] * se.values[i];
-//                }
-//                // Square root the result as to get a scalar sum of the three vectors
-//                pytha = (float) Math.sqrt(pytha);
+                float pytha = 0;
+                for (int i = 0; i < 3; i++) {
+                    // Perform pythagorean theorem on the X Y Z vectors
+                    pytha += se.values[i] * se.values[i];
+                }
+                // Square root the result as to get a scalar sum of the three vectors
+                pytha = (float) Math.sqrt(pytha);
 
                 // Feed the result through the low pass filter, and add it to the data array
                 float datapoint = lowPassFilter(pytha, dataPoints.get(dataPoints.size() - 1), 0.20f);
