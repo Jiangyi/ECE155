@@ -261,9 +261,9 @@ public class MapView extends View
 		
 		for(ArrayList<PointF> path : map.paths){
 			for(int i = 0; i < path.size() - 1; i++){
-				Log.e("Map", "path" + i + ": x: " + path.get(i).x + "; y: " + path.get(i).y);
-				canvas.drawLine(path.get(i).x * scale.x, path.get(i).y * scale.y, 
-								path.get(i+1).x * scale.x, path.get(i+1).y * scale.y, 
+//				Log.e("Map", "path" + i + ": x: " + path.get(i).x + "; y: " + path.get(i).y);
+				canvas.drawLine(path.get(i).x * scale.x, path.get(i).y * scale.y,
+								path.get(i+1).x * scale.x, path.get(i+1).y * scale.y,
 								linePaints.get(LINE_COLOR_INDEX));
 			}
 		}

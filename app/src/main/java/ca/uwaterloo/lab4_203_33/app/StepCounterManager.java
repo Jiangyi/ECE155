@@ -199,7 +199,7 @@ public class StepCounterManager {
         @Override
         public void onSensorChanged(SensorEvent se) {
             // Update the interface only if the sensor type is the one we want
-            if (!StepDisplacementFragment.isPaused && se.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            if (MapViewFragment.isPathSet() && se.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
                 // Variable to use for mathematical calculations
                 float pytha = 0;
                 for (int i = 0; i < 3; i++) {

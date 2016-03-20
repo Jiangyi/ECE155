@@ -1,13 +1,19 @@
 package ca.uwaterloo.lab4_203_33.app;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 import ca.uwaterloo.lab4_203_33.app.mapper.*;
 
 import java.io.File;
@@ -20,14 +26,20 @@ import java.util.List;
 public class MapViewFragment extends Fragment {
 
     // Member variable for the actual map view that the fragment will be containing
-    MapView mapView;
+    private MapView mapView;
+    private OrientationManager orientationManager;
+    private StepCounterManager stepCounterManager;
 
+    private static boolean pathSet = false;
+    private int angle = 0;
     public enum Direction {
         NORTH, SOUTH, EAST, WEST
     };
-    Direction calcDirection;
+    private Direction calcDirection;
     private static final float USER_POINT_OFFSET = 0.1f;
     private static final float CHECK_WALL_OFFSET = 0.2f;
+    private static final float STEP_CONSTANT = 0.75f;
+    private ImageView compassView, waypointView;
     /**
      * Returns a new instance of this fragment.
      */
@@ -44,6 +56,8 @@ public class MapViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_mapview, container, false);
+        compassView = (ImageView) rootView.findViewById(R.id.compass_arrow);
+        waypointView = (ImageView) rootView.findViewById(R.id.waypoint_arrow);
         // Instantiate the map view (Fits a 1280x720 panel at this moment)
         mapView = new MapView(rootView.getContext(), 700, 1000, 25, 25);
         // Get map object from the MapLoader
@@ -51,8 +65,47 @@ public class MapViewFragment extends Fragment {
         // Give the map to the MapView to display
         mapView.setMap(map);
         // Add the MapView to the fragment layout
-        LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.mapview_layout);
-        layout.addView(mapView);
+        RelativeLayout layout = (RelativeLayout) rootView.findViewById(R.id.mapview_layout);
+        layout.addView(mapView, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT) {{
+            addRule(RelativeLayout.BELOW, compassView.getId());
+        }});
+
+        // Call the step counter manager and register a listener on it
+        stepCounterManager = StepCounterManager.getInstance();
+        stepCounterManager.registerListener(new StepCounterManager.StepCounterListener() {
+            @Override
+            public void onStepChanged(int stepCounter) {
+                PointF userPoint = mapView.getUserPoint();
+                PointF newPoint = new PointF((float) (userPoint.x - STEP_CONSTANT * Math.sin(Math.toRadians(angle))),
+                                             (float) (userPoint.y - STEP_CONSTANT * Math.cos(Math.toRadians(angle))));
+                List<InterceptPoint> list = mapView.calculateIntersections(userPoint, newPoint);
+                if (list.isEmpty()) {
+                    calculateUserPath(newPoint, mapView.getEndPoint());
+                } else {
+                    PointF intercept = list.get(0).getPoint();
+                    intercept.x += USER_POINT_OFFSET * Math.sin(Math.toRadians(angle));
+                    intercept.y += USER_POINT_OFFSET * Math.cos(Math.toRadians(angle));
+                    calculateUserPath(intercept, mapView.getEndPoint());
+                }
+            }
+
+            @Override
+            public void onDataPointAdded(float dataPoint) {
+                // Do nothing
+            }
+        });
+
+        // Call the orientation manager and register a listener on it
+        orientationManager = OrientationManager.getInstance();
+        orientationManager.registerListener(new OrientationManager.OrientationListener() {
+            @Override
+            public void onOrientationChanged(float azimuth) {
+                // When the orientation has changed, convert and normalize the direction to
+                // degrees between 0 and 360
+                angle = (int) ((Math.round(Math.toDegrees(azimuth)) + 360) % 360);
+                compassView.setRotation(-angle);
+            }
+        });
         // Register the MapView context menu
         registerForContextMenu(mapView);
 
@@ -69,45 +122,87 @@ public class MapViewFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         boolean ret = mapView.onContextItemSelected(item);
-        final PointF startPoint = mapView.getStartPoint();
-        final PointF endPoint = mapView.getEndPoint();
+        PointF startPoint = mapView.getStartPoint();
+        PointF endPoint = mapView.getEndPoint();
         if (startPoint.x != 0 && startPoint.y != 0
                 && endPoint.x != 0 && endPoint.y != 0) {
-            List<InterceptPoint> intersectList = mapView.calculateIntersections(startPoint, endPoint);
-            if (!intersectList.isEmpty()) {
-                calculateUserPath(startPoint, endPoint, intersectList);
-            } else {
-                mapView.setUserPoint(startPoint);
-                mapView.setUserPath(new ArrayList<PointF>(){{
-                    add(startPoint);
-                    add(endPoint);
-                }});
-            }
+            calculateUserPath(startPoint, endPoint);
         }
         return ret;
     }
 
-    private void calculateUserPath(PointF start, PointF end, List<InterceptPoint> intersectList) {
-        ArrayList<PointF> userPath = new ArrayList<PointF>();
-        userPath.add(new PointF(start.x, start.y));
-
-        double x, y;
-        x = start.x < end.x ? intersectList.get(0).getPoint().x - USER_POINT_OFFSET
-                            : intersectList.get(0).getPoint().x + USER_POINT_OFFSET;
-        y = intersectList.get(0).getPoint().y;
-        userPath.add(new PointF((float) x, (float) y));
-        calcDirection = start.x < end.x ? Direction.SOUTH
-                                        : Direction.NORTH;
-        while (!mapView.calculateIntersections(userPath.get(userPath.size() - 1), end).isEmpty()) {
-            PointF userPoint = userPath.get(userPath.size() - 1);
-            LineSegment wall = getLeftSideWall(userPoint, calcDirection);
-            PointF endPoint = getWantedEndPoint(wall);
-
-            userPath.add(getNextUserPoint(userPoint, endPoint));
+    private void updateWaypointCompass(ArrayList<PointF> userPath) {
+        PointF startPoint = userPath.get(0);
+        PointF destPoint;
+        if (isCloseEnough(userPath.get(0), userPath.get(1))) {
+            if (userPath.size() > 2) {
+                destPoint = userPath.get(2);
+            } else {
+                Toast.makeText(getContext(), getString(R.string.destination_arrival), Toast.LENGTH_SHORT).show();
+                pathSet = false;
+                return;
+            }
+        } else {
+            destPoint = userPath.get(1);
         }
-        userPath.add(end);
+        double y = startPoint.y - destPoint.y;
+        double x = destPoint.x - startPoint.x;
+        int rotAngle = (int) Math.round((Math.toDegrees(Math.atan2(y, x)) + 360) % 360);
+        waypointView.setRotation(-rotAngle);
+
+    }
+
+    private boolean isCloseEnough(PointF a, PointF b) {
+        return Math.abs(a.x - b.x) < 0.5 && Math.abs(a.y - b.y) < 0.5;
+    }
+    private void calculateUserPath(PointF start, PointF end) {
+        List<InterceptPoint> intersectList = mapView.calculateIntersections(start, end);
+        ArrayList<PointF> userPath = new ArrayList<PointF>();
+        if (!intersectList.isEmpty()) {
+            userPath.add(new PointF(start.x, start.y));
+            PointF point;
+            if (start.x < end.x) {
+                point = mapView.calculateIntersections(start, new PointF(start.x + 1000, start.y)).get(0).getPoint();
+                point.x -= USER_POINT_OFFSET;
+                calcDirection = Direction.SOUTH;
+            } else {
+                point = mapView.calculateIntersections(start, new PointF(start.x - 1000, start.y)).get(0).getPoint();
+                point.x += USER_POINT_OFFSET;
+                calcDirection = Direction.NORTH;
+            }
+//            if (Math.abs(intercept.getLine().start.x - intercept.getLine().end.x) < 0.01) {
+//                // Vertical wall
+//                calcDirection = start.x < end.x ? Direction.SOUTH
+//                        : Direction.NORTH;
+//                x = start.x < end.x ? intercept.getPoint().x - USER_POINT_OFFSET
+//                        : intercept.getPoint().x + USER_POINT_OFFSET;
+//                y = intercept.getPoint().y;
+//            } else {
+//                // Horizontal wall
+//                calcDirection = start.y < end.y ? Direction.EAST
+//                        : Direction.WEST;
+//                x = intercept.getPoint().x;
+//                y = start.y < end.y ? intercept.getPoint().y + USER_POINT_OFFSET
+//                        : intercept.getPoint().y - USER_POINT_OFFSET;
+//            }
+            userPath.add(point);
+
+            while (!mapView.calculateIntersections(userPath.get(userPath.size() - 1), end).isEmpty()) {
+                PointF userPoint = userPath.get(userPath.size() - 1);
+                LineSegment wall = getLeftSideWall(userPoint, calcDirection);
+                PointF endPoint = getWantedEndPoint(wall);
+
+                userPath.add(getNextUserPoint(userPoint, endPoint));
+            }
+            userPath.add(end);
+        } else {
+            userPath.add(start);
+            userPath.add(end);
+        }
+        pathSet = true;
         mapView.setUserPath(userPath);
         mapView.setUserPoint(start);
+        updateWaypointCompass(userPath);
     }
 
     private LineSegment getLeftSideWall(PointF currentPoint, Direction direction) {
@@ -227,5 +322,9 @@ public class MapViewFragment extends Fragment {
         }
         // Shouldn't reach here
         return null;
+    }
+
+    public static boolean isPathSet() {
+        return pathSet;
     }
 }

@@ -57,7 +57,7 @@ public class OrientationManager {
         @Override
         public void onSensorChanged(SensorEvent se) {
             // Update if we're not paused and it's the right sensor type
-            if (!StepDisplacementFragment.isPaused && se.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            if (se.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
                 // The rotation vector sensor returns a vector array of values; Transform that into a rotation matrix
                 SensorManager.getRotationMatrixFromVector(rotationMatrix, se.values);
 

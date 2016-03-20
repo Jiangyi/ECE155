@@ -55,11 +55,6 @@ public class MainActivity extends AppCompatActivity
             // Select the proper fragment based on user selection, and update the title accordingly
             switch (position) {
                 case 0:
-                    mTitle = getString(R.string.title_step_displacement);
-                    fragment = StepDisplacementFragment.newInstance(this);
-                    currentPosition = position;
-                    break;
-                case 1:
                     mTitle = getString(R.string.title_mapview);
                     fragment = MapViewFragment.newInstance(this);
                     currentPosition = position;

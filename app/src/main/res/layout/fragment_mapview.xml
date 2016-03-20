@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/mapview_layout"
               android:layout_width="match_parent"
@@ -10,4 +10,39 @@
               android:orientation="vertical"
               tools:context=".MainActivity$GraphViewFragment">
 
-</LinearLayout>
+    <TextView
+            android:id="@+id/compass_text"
+            android:text="@string/compass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="48dp" android:layout_marginStart="48dp" android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" android:layout_alignParentStart="true"/>
+    <TextView
+            android:id="@+id/waypoint_text"
+            android:text="@string/waypoint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp" android:layout_above="@+id/compass_arrow"
+            android:layout_alignLeft="@+id/waypoint_arrow" android:layout_alignStart="@+id/waypoint_arrow"/>
+    <ImageView
+            android:id="@+id/compass_arrow"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:transformPivotX="50dp"
+            android:transformPivotY="50dp"
+            android:src="@drawable/arrow_vertical"
+            android:layout_marginLeft="30dp" android:layout_marginStart="30dp"
+            android:layout_below="@+id/compass_text" android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" android:layout_marginTop="20dp"/>
+    <ImageView
+            android:id="@+id/waypoint_arrow"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:transformPivotX="50dp"
+            android:transformPivotY="50dp"
+            android:src="@drawable/arrow_horizontal"
+            android:layout_marginRight="30dp" android:layout_marginEnd="30dp"
+            android:layout_alignTop="@+id/compass_arrow" android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
+</RelativeLayout>
