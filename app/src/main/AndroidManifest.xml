@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ca.uwaterloo.lab3_203_33.app" >
+    package="ca.uwaterloo.lab4_203_33.app" >
 
     <application
         android:allowBackup="true"

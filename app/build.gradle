@@ -17,7 +17,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "ca.uwaterloo.lab3_203_33.app"
+        applicationId "ca.uwaterloo.lab4_203_33.app"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1

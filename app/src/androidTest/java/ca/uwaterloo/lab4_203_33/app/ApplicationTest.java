@@ -1,4 +1,4 @@
-package ca.uwaterloo.lab3_203_33.app;
+package ca.uwaterloo.lab4_203_33.app;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

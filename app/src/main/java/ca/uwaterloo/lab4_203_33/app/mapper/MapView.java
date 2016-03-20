@@ -20,25 +20,22 @@
  * 
  */
 
-package ca.uwaterloo.lab3_203_33.app.mapper;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+package ca.uwaterloo.lab4_203_33.app.mapper;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Handler;
-import android.view.GestureDetector;
+import android.util.Log;
+import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.ContextMenu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Mapper class for getting user input reletive to an svg map loaded by the MapLoader
@@ -264,6 +261,7 @@ public class MapView extends View
 		
 		for(ArrayList<PointF> path : map.paths){
 			for(int i = 0; i < path.size() - 1; i++){
+				Log.e("Map", "path" + i + ": x: " + path.get(i).x + "; y: " + path.get(i).y);
 				canvas.drawLine(path.get(i).x * scale.x, path.get(i).y * scale.y, 
 								path.get(i+1).x * scale.x, path.get(i+1).y * scale.y, 
 								linePaints.get(LINE_COLOR_INDEX));
@@ -361,7 +359,11 @@ public class MapView extends View
 					return 1;
 			}
 		});
-		
+//		Log.e("InterceptPoint", "Size: " + ret.size());
+//		for (InterceptPoint point : ret) {
+//			Log.e("InterceptPoint_Line", "Start: " + point.getLine().start.x + "," + point.getLine().start.y);
+//			Log.e("InterceptPoint_Line", "End: " + point.getLine().end.x + "," + point.getLine().end.y);
+//		}
 		return ret;
 	}
 

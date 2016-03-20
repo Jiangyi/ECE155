@@ -20,12 +20,12 @@
  * 
  */
 
-package ca.uwaterloo.lab3_203_33.app.mapper;
+package ca.uwaterloo.lab4_203_33.app.mapper;
+
+import android.graphics.PointF;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import android.graphics.PointF;
 
 /**
  * A representation of a map. All values stored in meters.
