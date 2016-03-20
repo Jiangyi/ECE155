@@ -10,6 +10,7 @@
               android:orientation="vertical"
               tools:context=".MainActivity$GraphViewFragment">
 
+    <!-- Textview for compass -->
     <TextView
             android:id="@+id/compass_text"
             android:text="@string/compass"
@@ -17,6 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="48dp" android:layout_marginStart="48dp" android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true" android:layout_alignParentStart="true"/>
+
+    <!-- Textview for Waypoint -->
     <TextView
             android:id="@+id/waypoint_text"
             android:text="@string/waypoint"
@@ -25,6 +28,8 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp" android:layout_above="@+id/compass_arrow"
             android:layout_alignLeft="@+id/waypoint_arrow" android:layout_alignStart="@+id/waypoint_arrow"/>
+
+    <!-- ImageView displaying the compass arrow -->
     <ImageView
             android:id="@+id/compass_arrow"
             android:layout_width="100dp"
@@ -35,6 +40,8 @@
             android:layout_marginLeft="30dp" android:layout_marginStart="30dp"
             android:layout_below="@+id/compass_text" android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" android:layout_marginTop="20dp"/>
+
+    <!-- ImageView displaying the waypoint arrow -->
     <ImageView
             android:id="@+id/waypoint_arrow"
             android:layout_width="100dp"
