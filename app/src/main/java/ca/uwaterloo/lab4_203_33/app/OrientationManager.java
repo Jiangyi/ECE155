@@ -4,6 +4,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
+import ca.uwaterloo.lab4_203_33.app.mapper.MapView;
 
 import java.util.LinkedList;
 
@@ -57,7 +59,7 @@ public class OrientationManager {
         @Override
         public void onSensorChanged(SensorEvent se) {
             // Update if we're not paused and it's the right sensor type
-            if (se.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            if (MapViewFragment.isPathSet() && se.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
                 // The rotation vector sensor returns a vector array of values; Transform that into a rotation matrix
                 SensorManager.getRotationMatrixFromVector(rotationMatrix, se.values);
 

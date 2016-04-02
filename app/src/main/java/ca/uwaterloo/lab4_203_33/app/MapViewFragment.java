@@ -24,7 +24,7 @@ public class MapViewFragment extends Fragment {
     // Constants for various calculations
     private static final float USER_POINT_OFFSET = 0.1f;
     private static final float CHECK_WALL_OFFSET = 0.2f;
-    private static final float STEP_CONSTANT = 0.75f;
+    private static final float STEP_CONSTANT = 1.25f;
     // Member variable for the actual map view that the fragment will be containing
     private MapView mapView;
     // Member variables for the two managers we will be relying on
@@ -87,7 +87,7 @@ public class MapViewFragment extends Fragment {
                 // Get the current user point
                 PointF userPoint = mapView.getUserPoint();
                 // Calculate the next user point
-                PointF newPoint = new PointF((float) (userPoint.x - STEP_CONSTANT * Math.sin(Math.toRadians(compassAngle))),
+                PointF newPoint = new PointF((float) (userPoint.x + STEP_CONSTANT * Math.sin(Math.toRadians(compassAngle))),
                         (float) (userPoint.y - STEP_CONSTANT * Math.cos(Math.toRadians(compassAngle))));
                 // See if there is a wall between the current point and the next point
                 List<InterceptPoint> list = mapView.calculateIntersections(userPoint, newPoint);
@@ -98,7 +98,7 @@ public class MapViewFragment extends Fragment {
                     // There is a wall, so move to the closest point that's just off of the wall,
                     // and re-calculate the user path with that point as the current user point instead.
                     PointF intercept = list.get(0).getPoint();
-                    intercept.x += USER_POINT_OFFSET * Math.sin(Math.toRadians(compassAngle));
+                    intercept.x -= USER_POINT_OFFSET * Math.sin(Math.toRadians(compassAngle));
                     intercept.y += USER_POINT_OFFSET * Math.cos(Math.toRadians(compassAngle));
                     calculateUserPath(intercept, mapView.getEndPoint());
                 }
@@ -118,7 +118,7 @@ public class MapViewFragment extends Fragment {
                 // When the orientation has changed, convert and normalize the direction to
                 // degrees between 0 and 360
                 compassAngle = (int) ((Math.round(Math.toDegrees(azimuth)) + 360) % 360);
-                compassView.setRotation(-compassAngle);
+                compassView.setRotation(compassAngle);
             }
         });
         // Register the MapView context menu
@@ -200,7 +200,6 @@ public class MapViewFragment extends Fragment {
             // Get the first intersection, and calculate the angle between it and the start point (Relative to East)
             PointF intersect = intersectList.get(0).getPoint();
             int angle = calculateAngle(start, intersect);
-
             // Calculate a point that is just off of it; This will be the point right after the start point
             PointF point = new PointF((float) (intersect.x - USER_POINT_OFFSET * Math.cos(Math.toRadians(angle))),
                     (float) (intersect.y + USER_POINT_OFFSET * Math.sin(Math.toRadians(angle))));
@@ -237,21 +236,39 @@ public class MapViewFragment extends Fragment {
             }
             // Add the last point as the end point
             userPath.add(end);
+            shortenPath(userPath);
         } else {
             // Clear line of sight; Path consists of just start and end
             userPath.add(start);
             userPath.add(end);
         }
+        // The path is now created, so the boolean is set to true
+        pathSet = true;
         // Set the user path on the mapview with the constructed arraylist
         mapView.setUserPath(userPath);
         // Set the user to start at the start point
         mapView.setUserPoint(start);
         // Update the waypoint compass
         updateWaypointCompass(userPath);
-        // The path is now created, so the boolean is set to true
-        pathSet = true;
     }
 
+    private void shortenPath(ArrayList<PointF> userPath) {
+        PointF startPoint = userPath.get(0);
+        int startIndex = 0;
+        for (int i = userPath.size() - 1; i >= 0; i--) {
+            // Only run if the point we're checking is not the last two points of the graph
+            // Cause they'll be connected already
+            if (userPath.indexOf(startPoint) < userPath.size() - 3) {
+                // If the two points are directly connected, delete all the points between them
+                if (mapView.calculateIntersections(startPoint, userPath.get(i)).isEmpty()) {
+                    startIndex = userPath.indexOf(startPoint) + 1;
+                    startPoint = userPath.get(i);
+                    userPath.subList(startIndex, i).clear();
+                    i = userPath.size() - 1;
+                }
+            }
+        }
+    }
     // Check if the given line segment is vertical
     private boolean isLineVertical(LineSegment line) {
         return Math.abs(line.end.x - line.start.x) < CHECK_WALL_OFFSET;
